@@ -17,6 +17,7 @@ import org.keycloak.services.messages.Messages;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RegistrationCaptcha implements FormAction, FormActionFactory, ConfiguredProvider {
@@ -94,9 +95,16 @@ public class RegistrationCaptcha implements FormAction, FormActionFactory, Confi
         }
     }
 
-    protected boolean validateCaptcha(ValidationContext context, boolean success, String captcha, String answer) {
-        if (captcha.equalsIgnoreCase(answer)) {
-            success = Boolean.TRUE;
+    protected boolean validateCaptcha(ValidationContext context, boolean success, String captcha, String answerString) {
+        answerString = answerString.replace(" ", "");
+        List<String> answeres = Arrays.asList(answerString.split(","));
+
+        captcha = captcha.replace(" ", "");
+
+        for (String answer: answeres) {
+            if (captcha.equalsIgnoreCase(answer)) {
+                success = Boolean.TRUE;
+            }
         }
 
         return success;
@@ -146,7 +154,7 @@ public class RegistrationCaptcha implements FormAction, FormActionFactory, Confi
         property.setName(CAPTCHA_ANSWER);
         property.setLabel("Captcha Answer");
         property.setType(ProviderConfigProperty.STRING_TYPE);
-        property.setHelpText("Answer to the Question");
+        property.setHelpText("Answers to the Question (seperated by commas)");
         CONFIG_PROPERTIES.add(property);
     }
 
